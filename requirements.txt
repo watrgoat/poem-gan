@@ -1,4 +1,2 @@
 pandas
 tensorflow
-beautifulsoup4
-requests
