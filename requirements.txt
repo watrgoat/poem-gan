@@ -1,3 +1,6 @@
 pandas
 tensorflow
 nltk
+beautifulsoup4
+selenium
+# http://chromedriver.chromium.org/downloads
