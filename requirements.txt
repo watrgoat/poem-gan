@@ -3,4 +3,5 @@ tensorflow
 nltk
 beautifulsoup4
 selenium
+webdriver-manager
 # http://chromedriver.chromium.org/downloads
