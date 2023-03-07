@@ -28,6 +28,7 @@ driver.implicitly_wait(5)
 
 
 def scrape_urls(url):
+    print(url)
     num_links = 20
 
     driver.get(f"https://www.poetryfoundation.org/poems/browse#page={url}&sort_by=recently_added") # load the page
@@ -58,12 +59,13 @@ def gen_urls(num):
 
 def main():
     start = time.time()
-    num_urls = 100 # number of urls wanted to be generated: max is 2341
-    num_cores = cpu_count() # returns the number of vcpus available
-    
+    num_urls = 1000 # number of urls wanted to be generated: max is 2341
+    num_processes = cpu_count() # returns the number of vcpus available
+    chunksz = int(num_urls//num_processes)
+
     out_urls = set()
-    with Pool(num_cores) as p:
-        for result in p.map(scrape_urls, range(1, num_urls+1)):
+    with Pool(num_processes) as p:
+        for result in p.map(scrape_urls, range(1, num_urls+1), chunksize=chunksz):
             out_urls |= result
     
     with open('urls.txt', 'w') as f:
@@ -72,12 +74,14 @@ def main():
     
     end = time.time()
     print(f"Time spent: {end-start}")
-    # 3 sec time:
-    # 3 sec count:
-    # 2 sec time: 
-    # 2 sec count: 
-    # 1 sec time: 56
-    # 1 sec count: 534
+    # 3 sec time: 108
+    # 3 sec count: 776 ?????
+    # 2 sec 10b time: 83
+    # 2 sec 10b count: 931
+    # 2 sec time: 77
+    # 2 sec count: 792
+    # 1 sec time: 48
+    # 1 sec count: 596
 
 if __name__ == "__main__":
     main()
