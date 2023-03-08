@@ -11,6 +11,9 @@ from multiprocessing import cpu_count
 from multiprocessing import Pool
 import time
 
+global options
+global chrome_service
+
 chrome_path = ChromeDriverManager().install() #Path for my Chrome driver.
 options = webdriver.ChromeOptions()
 options.add_argument('--headless') # it's more scalable to work in headless mode 
@@ -20,18 +23,16 @@ options.page_load_strategy = 'none'
 # this returns the path web driver downloaded 
 chrome_path = ChromeDriverManager().install()
 chrome_service = Service(chrome_path)
-# pass the defined options and service objects to initialize the web driver 
-
-global driver
-driver = Chrome(options=options, service=chrome_service)
-driver.implicitly_wait(5)
+# pass the defined options and service objects to initialize the web driver
 
 
-def scrape_urls(url):
-    print(url)
-    num_links = 20
+def scrape_urls(pg_num: int):
+    driver = Chrome(options=options, service=chrome_service)
+    driver.implicitly_wait(5)
 
-    driver.get(f"https://www.poetryfoundation.org/poems/browse#page={url}&sort_by=recently_added") # load the page
+    link = f"https://www.poetryfoundation.org/poems/browse#page={pg_num}&sort_by=recently_added"
+
+    driver.get(link) # load the page
 
     # give it some time
     driver.implicitly_wait(45)
@@ -49,17 +50,25 @@ def scrape_urls(url):
     return out_urls
 
 
-def gen_urls(num):
-    urls = []
-    for i in range(num):
-        urls.append(f"https://www.poetryfoundation.org/poems/browse#page={i+1}&sort_by=recently_added")
+def write(urls: set):
+    # read past urls into set
+    with open('urls.txt', 'r') as f:
+        prev_urls = set(f.readlines()[0].split(' '))
     
-    return urls
+    print(f'# of urls: {len(prev_urls.union(urls))}')
 
+    # get urls not already in file
+    out_urls = urls.difference(prev_urls)
+
+    # append urls out to file
+    with open('urls.txt', 'a') as f:
+        for url in out_urls:
+            f.write(url+' ')
+    return
 
 def main():
     start = time.time()
-    num_urls = 1000 # number of urls wanted to be generated: max is 2341
+    num_urls = 200 # number of urls wanted to be generated: max is 2341
     num_processes = cpu_count() # returns the number of vcpus available
     chunksz = int(num_urls//num_processes)
 
@@ -68,20 +77,11 @@ def main():
         for result in p.map(scrape_urls, range(1, num_urls+1), chunksize=chunksz):
             out_urls |= result
     
-    with open('urls.txt', 'w') as f:
-        for url in out_urls:
-            f.write(url+'\n')
+    write(out_urls)
     
     end = time.time()
     print(f"Time spent: {end-start}")
-    # 3 sec time: 108
-    # 3 sec count: 776 ?????
-    # 2 sec 10b time: 83
-    # 2 sec 10b count: 931
-    # 2 sec time: 77
-    # 2 sec count: 792
-    # 1 sec time: 48
-    # 1 sec count: 596
+
 
 if __name__ == "__main__":
     main()
