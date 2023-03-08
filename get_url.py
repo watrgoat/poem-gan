@@ -36,7 +36,7 @@ def scrape_urls(pg_num: int):
 
     # give it some time
     driver.implicitly_wait(45)
-    time.sleep(2)
+    time.sleep(5)
 
     html_source = driver.page_source
 
@@ -52,7 +52,7 @@ def scrape_urls(pg_num: int):
 
 def write(urls: set):
     # read past urls into set
-    with open('urls.txt', 'r') as f:
+    with open('urls.txt', mode='r', encoding='utf-8') as f:
         prev_urls = set(f.readlines()[0].split(' '))
     
     print(f'# of urls: {len(prev_urls.union(urls))}')
@@ -61,20 +61,20 @@ def write(urls: set):
     out_urls = urls.difference(prev_urls)
 
     # append urls out to file
-    with open('urls.txt', 'a') as f:
+    with open('urls.txt', mode='a', encoding='utf-8') as f:
         for url in out_urls:
             f.write(url+' ')
     return
+
 
 def main():
     start = time.time()
     num_urls = 200 # number of urls wanted to be generated: max is 2341
     num_processes = cpu_count() # returns the number of vcpus available
-    chunksz = int(num_urls//num_processes)
 
     out_urls = set()
     with Pool(num_processes) as p:
-        for result in p.map(scrape_urls, range(1, num_urls+1), chunksize=chunksz):
+        for result in p.map(scrape_urls, range(100, num_urls+1), chunksize=10):
             out_urls |= result
     
     write(out_urls)
