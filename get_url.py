@@ -69,12 +69,12 @@ def write(urls: set):
 
 def main():
     start = time.time()
-    num_urls = 200 # number of urls wanted to be generated: max is 2341
+    num_urls = 260 # number of urls wanted to be generated: max is 2341
     num_processes = cpu_count() # returns the number of vcpus available
 
     out_urls = set()
     with Pool(num_processes) as p:
-        for result in p.map(scrape_urls, range(100, num_urls+1), chunksize=10):
+        for result in p.map(scrape_urls, range(230, num_urls+1)):
             out_urls |= result
     
     write(out_urls)

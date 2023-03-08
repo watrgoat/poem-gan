@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
-from bs4 import SoupStrainer
 import requests
+import re
 
 # For simulating the table on the webpage which is dynamically loaded.
 from selenium import webdriver
@@ -12,41 +12,52 @@ from multiprocessing import cpu_count
 from multiprocessing import Pool
 import time
 
-global options
-global chrome_service
-
-chrome_path = ChromeDriverManager().install() #Path for my Chrome driver.
-options = webdriver.ChromeOptions()
-options.add_argument('--headless') # it's more scalable to work in headless mode 
-# normally, selenium waits for all resources to download 
-# we don't need it as the page also populated with the running javascript code. 
-options.page_load_strategy = 'none'
-# this returns the path web driver downloaded 
-chrome_path = ChromeDriverManager().install()
-chrome_service = Service(chrome_path)
 
 def scrape_poem(url):
     r = requests.get(url)
     
     soup = BeautifulSoup(r.text, features='html.parser')
-    result = soup.find_all('div', {'style':'text-indent: -1em; padding-left: 1em;'})
 
+    result = soup.find_all('div', {'style':'text-indent: -1em; padding-left: 1em;'})
+    poem = ''
     for div in result:
-        print(div.text.strip())
-    return
+        poem += div.text.strip()+'\n'
+
+    ugly_tags = soup.find_all('a', href=re.compile('https://www.poetryfoundation.org/poems/browse#topics=[0-9]+'))
+    tags = []
+
+    for U_tag in ugly_tags:
+        tags.append(U_tag.text)
+
+    return tags
 
 
 def get_urls():
-    with open('urls.txt', 'r') as f:
+    with open('urls.txt', 'r', encoding='utf-8') as f:
         urls = f.readlines()[0].split(' ')
     
     return urls
 
+
+def save_data(data):
+    # loop over elements
+    # sub list[0] = poem title
+    # sub list[1] = poet name
+    # sub list[2] = poem content
+    # sub list[3] = tags????
+
+    pass
+
+
 def main():
     urls = get_urls()
+    test_url = 'https://www.poetryfoundation.org/poetrymagazine/poems/159609/11-violence-anglo-linguistic'
     print(len(urls))
-
-    scrape_poem('https://www.poetryfoundation.org/poetrymagazine/poems/159609/11-violence-anglo-linguistic')
+    
+    # with Pool(cpu_count()) as p:
+    #     results = p.map(scrape_poem, urls)
+    
+    print(scrape_poem(test_url))
 
 
 if __name__ == '__main__':
