@@ -1,3 +1,6 @@
+# DO NOT USE THIS IT IS AGAINST THE POETRY FOUNDATION TOS IT IS JUST THEORETICAL
+# You will most likely get ip banned, but I wouldn't know bc I never used it... ;)
+
 import bs4 as bs
 import re
 
