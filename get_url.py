@@ -39,7 +39,7 @@ def scrape_urls(pg_num: int):
 
     # give it some time
     driver.implicitly_wait(45)
-    time.sleep(5)
+    time.sleep(3)
 
     html_source = driver.page_source
 
@@ -55,29 +55,31 @@ def scrape_urls(pg_num: int):
 
 def write(urls: set):
     # read past urls into set
+    prev_urls = set()
     with open('urls.txt', mode='r', encoding='utf-8') as f:
-        prev_urls = set(f.readlines()[0].split(' '))
+        for line in f.readlines():
+            prev_urls.add(line.strip())
     
-    print(f'# of urls: {len(prev_urls.union(urls))}')
-
+    print(f'# of old urls: {len(prev_urls)}')
+    
     # get urls not already in file
     out_urls = urls.difference(prev_urls)
-
+    print(len(out_urls))
     # append urls out to file
     with open('urls.txt', mode='a', encoding='utf-8') as f:
         for url in out_urls:
-            f.write(url+' ')
+            f.write(url+'\n')
     return
 
 
 def main():
     start = time.time()
-    num_urls = 260 # number of urls wanted to be generated: max is 2341
-    num_processes = cpu_count() # returns the number of vcpus available
+    num_urls = 5 # number of urls wanted to be generated: max is 2341
+    num_processes = 2 # cpu_count() # returns the number of vcpus available
 
     out_urls = set()
     with Pool(num_processes) as p:
-        for result in p.map(scrape_urls, range(230, num_urls+1)):
+        for result in p.map(scrape_urls, range(1, num_urls+1)):
             out_urls |= result
     
     write(out_urls)
