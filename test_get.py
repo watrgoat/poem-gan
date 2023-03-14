@@ -22,10 +22,10 @@ def write(urls: set):
 
 hdrs = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Safari/605.1.15', 'Referer':'http://www.google.com/', 'Accept-Language':'en-gb'}
 
-for num in range(100, 1500):
+for num in range(300, 1500):
     r = requests.get(f"https://www.poetryfoundation.org/ajax/poems?page={num}&sort_by=recently_added", headers=hdrs)
 
-    if r.status_code == 200:
+    if r.status_code != 200:
         print("response not given")
         continue
 
