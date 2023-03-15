@@ -41,6 +41,6 @@ def main(num):
     return
 
 if __name__ == '__main__':
-    numbas = list(range(1, 5))
+    numbas = list(range(1, 5)) # change to what is being searched
     with Pool(3) as p:
         p.map(main, numbas)
