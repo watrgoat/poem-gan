@@ -9,18 +9,8 @@
 
 
 import pandas as pd
-# pip install py_thesaurus
-from py_thesaurus import Thesaurus
 
-input_word = "dream"
-
-new_instance = Thesaurus(input_word)
-
-# Get the synonyms according to part of speech
-# Default part of speech is noun
-
-print(new_instance.get_synonym())
-
+# https://pypi.org/project/gcld3/
 
 
 def get_poems(file_name: str) -> pd.DataFrame:
