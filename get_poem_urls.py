@@ -4,10 +4,9 @@ from multiprocessing import Pool
 
 
 # read past urls into set
-prev_urls = set()
 with open('urls.txt', mode='r', encoding='utf-8') as f:
-    for line in f.readlines():
-        prev_urls.add(line.strip())
+    urls = f.read()
+    prev_urls = set(urls.split('\n'))
 
 # write urls back into txt file
 def write(urls: set):
