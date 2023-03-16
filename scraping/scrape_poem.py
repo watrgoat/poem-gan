@@ -4,7 +4,7 @@ import re
 import pandas as pd
 from multiprocessing import cpu_count
 from multiprocessing import Pool
-
+from pathlib import Path
 
 hdrs = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Safari/605.1.15', 'Referer':'http://www.google.com/', 'Accept-Language':'en-gb'}
 
@@ -36,7 +36,9 @@ def scrape_poem(url):
 
 
 def get_urls():
-    with open('urls.txt', mode='r', encoding='utf-8') as f:
+    data_folder = Path("scraping/")
+    file_path = data_folder / "urls.txt"
+    with open(file_path, mode='r', encoding='utf-8') as f:
         urls = f.read()
 
     urls = urls.split('\n')
@@ -54,7 +56,7 @@ def save_data(data):
 
 def main():
     urls = get_urls()
-    urls = urls[:10]
+    urls = urls[:12]
     print(len(urls))
 
     processes = int(cpu_count()*.7)
