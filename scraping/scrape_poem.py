@@ -19,7 +19,10 @@ def scrape_poem(url):
     # get the poem text
     poem = str()
     for div in soup.find_all('div', {'style':'text-indent: -1em; padding-left: 1em;'}):
-        poem += div.text.strip()+'\n'
+        line = div.text.strip().replace(u'\xa0', u'')
+        line = re.sub("\s\s+" , " ", line)
+        poem += line+'\n'
+    
     poem = poem.strip()
     # get the poem tags
     ugly_tags = soup.find_all('a', href=re.compile('https://www.poetryfoundation.org/poems/browse#topics=[0-9]+'))
@@ -29,6 +32,7 @@ def scrape_poem(url):
     
     # get the poem title
     title = soup.find('h3', {'class': 'c-hdgSans c-hdgSans_5 c-mix-hdgSans_blocked'}).text
+    print(f'scraped: {title}')
 
     author = soup.find('span', {'class':'c-txt c-txt_attribution'}).text.strip()[3:]
 
@@ -48,18 +52,17 @@ def get_urls():
 def save_data(data):
     df = pd.DataFrame(columns=['title', 'author', 'content', 'tags'])
     for poem in data:
-        df.loc[len(df.index)] = poem
+        if poem != None:
+            df.loc[len(df.index)] = poem
     
     df.to_pickle('poems.pickle')
     
 
 
 def main():
-    urls = get_urls()
-    urls = urls[:12]
-    print(len(urls))
+    urls = get_urls() # scraped the first 200
 
-    processes = int(cpu_count()*.7)
+    processes = int(cpu_count()*.75)
     print(processes)
     
     with Pool(processes) as p:
