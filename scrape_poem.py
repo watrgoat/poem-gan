@@ -1,16 +1,10 @@
 from bs4 import BeautifulSoup
 import requests
 import re
-
-# For simulating the table on the webpage which is dynamically loaded.
-from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver import Chrome 
-
+import pandas as pd
 from multiprocessing import cpu_count
 from multiprocessing import Pool
-import time
+
 
 hdrs = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Safari/605.1.15', 'Referer':'http://www.google.com/', 'Accept-Language':'en-gb'}
 
@@ -23,10 +17,10 @@ def scrape_poem(url):
     soup = BeautifulSoup(r.text, features='html.parser')
 
     # get the poem text
-    poem = ''
+    poem = str()
     for div in soup.find_all('div', {'style':'text-indent: -1em; padding-left: 1em;'}):
         poem += div.text.strip()+'\n'
-
+    poem = poem.strip()
     # get the poem tags
     ugly_tags = soup.find_all('a', href=re.compile('https://www.poetryfoundation.org/poems/browse#topics=[0-9]+'))
     tags = []
@@ -38,7 +32,7 @@ def scrape_poem(url):
 
     author = soup.find('span', {'class':'c-txt c-txt_attribution'}).text.strip()[3:]
 
-    return title, author, poem.strip(), tags
+    return title, author, poem, tags
 
 
 def get_urls():
@@ -49,24 +43,27 @@ def get_urls():
     
     return urls
 
-
 def save_data(data):
-    # loop over elements
-    # sub list[0] = poem title
-    # sub list[1] = poet name
-    # sub list[2] = poem content
-    # sub list[3] = tags????
+    df = pd.DataFrame(columns=['title', 'author', 'content', 'tags'])
+    for poem in data:
+        df.loc[len(df.index)] = poem
+    
+    df.to_pickle('poems.pickle')
+    
 
-    pass
 
 def main():
     urls = get_urls()
     urls = urls[:10]
     print(len(urls))
-    # with Pool(cpu_count()) as p:
-    #     results = p.map(scrape_poem, urls)
-    for url in urls:
-        print(scrape_poem(url))
+
+    processes = int(cpu_count()*.7)
+    print(processes)
+    
+    with Pool(processes) as p:
+        results = p.map(scrape_poem, urls)
+    
+    save_data(results)
 
 
 if __name__ == '__main__':
