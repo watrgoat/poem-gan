@@ -3,13 +3,16 @@ import json
 from multiprocessing import Pool
 
 
+# read past urls into set
+prev_urls = set()
+with open('urls.txt', mode='r', encoding='utf-8') as f:
+    for line in f.readlines():
+        prev_urls.add(line.strip())
+
+# write urls back into txt file
 def write(urls: set):
-    # read past urls into set
-    prev_urls = set()
-    with open('urls.txt', mode='r', encoding='utf-8') as f:
-        for line in f.readlines():
-            prev_urls.add(line.strip())
-    
+    global prev_urls
+
     print(f'# of old urls: {len(prev_urls)}')
     
     # get urls not already in file
@@ -19,11 +22,14 @@ def write(urls: set):
     with open('urls.txt', mode='a', encoding='utf-8') as f:
         for url in out_urls:
             f.write(url+'\n')
+    
+    prev_urls |= out_urls
     return
+
 
 hdrs = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Safari/605.1.15', 'Referer':'http://www.google.com/', 'Accept-Language':'en-gb'}
 
-def main(num):
+def get_urls(num):
     r = requests.get(f"https://www.poetryfoundation.org/ajax/poems?page={num}&sort_by=recently_added", headers=hdrs)
 
     if r.status_code != 200:
@@ -40,7 +46,11 @@ def main(num):
     print(f'Done on url #: {num}')
     return
 
-if __name__ == '__main__':
-    numbas = list(range(1, 5)) # change to what is being searched
+def main():
+    numbas = list(range(1, 2)) # change to what is being searched 1-1780, 1700-2300
+    
     with Pool(3) as p:
-        p.map(main, numbas)
+        p.map(get_urls, numbas)
+
+if __name__ == '__main__':
+    main()
