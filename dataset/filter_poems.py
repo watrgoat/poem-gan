@@ -5,9 +5,9 @@ import string
 import re
 
 
-def detect_english(poem, min_prob):
+def detect_english(text, min_prob=.98):
     # creates a list of language probabilties
-    lang_probabilities = detect_langs(poem)
+    lang_probabilities = detect_langs(text)
 
     is_english = False
 
@@ -20,21 +20,23 @@ def detect_english(poem, min_prob):
 
 
 def main():
-    poem_path = Path(r'english_poems.pickle')
+    poem_path = Path(r'mostly_english_poems.pickle')
 
     df = pd.read_pickle(poem_path)
-
+    print(f'old length: {len(df)}')
     for i in range(len(df)):
         # removes junk from poems: newlines, punctuation, and widespaces
         poem = df.content[i].replace('\n', ' ')
         poem = poem.translate(str.maketrans('', '', string.punctuation))
         poem = re.sub('\s\s+' , ' ', poem)
-        if detect_english(poem, .98) != True:
+        if detect_english(poem, .988) != True:
             df.drop(index=i, inplace=True)
     
     df.reset_index(drop=True, inplace=True)
+
+    print(f'new lenght: {len(df)}')
     
-    df.to_pickle('english_poems.pickle')
+    df.to_pickle('filtered_poems.pickle')
 
 if __name__ == '__main__':
     main()

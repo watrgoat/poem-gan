@@ -5,13 +5,16 @@ import pandas as pd
 from multiprocessing import cpu_count
 from multiprocessing import Pool
 from pathlib import Path
+import json
+
 
 url_path = Path(r'scraping\urls.txt')
 poem_path = Path(r'dataset\poems.pickle')
+
 hdrs = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Safari/605.1.15', 'Referer':'http://www.google.com/', 'Accept-Language':'en-gb'}
 
 
-def scrape_poem(url):
+def scrape_poetry_foundation(url):
     if url == '':
         return
     # need to check if poem is an image
@@ -51,6 +54,37 @@ def scrape_poem(url):
     return title, author, poem, tags
 
 
+def get_poets_org(num) -> pd.DataFrame:
+    print(f'working on: {num}')
+    # gets 20 poems
+
+    url = f'https://api.poets.org/api/poems?page={num}'
+
+    r = requests.get(url, headers=hdrs)
+
+    if r.status_code != 200:
+        print("response not given")
+        return
+
+    df = pd.DataFrame(columns=['title', 'author', 'content', 'tags'])
+
+    data = json.loads(r.text)
+    
+    for row in data.get('rows'):
+        title = row['title']
+        most_auth = row['field_author'].split('">')[-1]
+        author = most_auth[:-4]
+        tags = []
+        clean = re.compile('<.*?>')
+        poem = re.sub(clean, " ", row['body'])
+        poem = re.sub("\s\s+" , "\n", poem)
+        # remove extra spacing
+        poem = poem.strip()
+        df.loc[len(df)] = [title, author, poem, tags]
+
+    return df
+
+
 def get_urls():
     data_folder = Path("scraping/")
     file_path = data_folder / "urls.txt"
@@ -72,18 +106,13 @@ def save_data(data):
     
 
 def main():
-    urls = get_urls()
-    urls = urls[:10]
-    print(len(urls))
+    mass_df = pd.DataFrame(columns=['title', 'author', 'content', 'tags'])
 
-    processes = int(cpu_count()*.75)
-    print(processes)
-    
-    with Pool(processes) as p:
-        results = p.map(scrape_poem, urls)
-    
-    save_data(results)
+    for i in range(694):
+        mass_df = pd.concat([mass_df, get_poets_org(i)]) # max = 693
+        mass_df.reset_index(drop=True, inplace=True)
 
+    mass_df.to_pickle('poets_org.pickle')
 
 if __name__ == '__main__':
     main()
