@@ -1,12 +1,17 @@
 import requests
 import json
 from multiprocessing import Pool
+from pathlib import Path
+from multiprocessing import cpu_count
 
+
+url_path = Path(u'scraping\urls.txt')
 
 # read past urls into set
-with open('urls.txt', mode='r', encoding='utf-8') as f:
+with open(url_path, mode='r', encoding='utf-8') as f:
     urls = f.read()
     prev_urls = set(urls.split('\n'))
+
 
 # write urls back into txt file
 def write(urls: set):
@@ -18,7 +23,7 @@ def write(urls: set):
     out_urls = urls.difference(prev_urls)
     print(len(out_urls))
     # append urls out to file
-    with open('urls.txt', mode='a', encoding='utf-8') as f:
+    with open(url_path, mode='a', encoding='utf-8') as f:
         for url in out_urls:
             f.write(url+'\n')
     
@@ -27,6 +32,7 @@ def write(urls: set):
 
 
 hdrs = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Safari/605.1.15', 'Referer':'http://www.google.com/', 'Accept-Language':'en-gb'}
+
 
 def get_urls(num):
     r = requests.get(f"https://www.poetryfoundation.org/ajax/poems?page={num}&sort_by=recently_added", headers=hdrs)
@@ -45,11 +51,14 @@ def get_urls(num):
     print(f'Done on url #: {num}')
     return
 
+
 def main():
-    numbas = list(range(1, 2)) # change to what is being searched 1-1780, 1700-2300
+    numbas = list(range(1, 5))
+    processes = int(cpu_count()*.75)
     
     with Pool(3) as p:
         p.map(get_urls, numbas)
+
 
 if __name__ == '__main__':
     main()

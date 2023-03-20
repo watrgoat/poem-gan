@@ -1,7 +1,5 @@
 pandas
-tensorflow
-nltk
 beautifulsoup4
-selenium
-webdriver-manager
+numpy
+langdetect
 # http://chromedriver.chromium.org/downloads
