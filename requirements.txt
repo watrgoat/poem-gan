@@ -2,4 +2,6 @@ pandas
 beautifulsoup4
 numpy
 langdetect
+contractions
+nltk
 # http://chromedriver.chromium.org/downloads
