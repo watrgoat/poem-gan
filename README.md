@@ -13,7 +13,7 @@ Natural language generation (NLG) for writing complex poetry
 Scraped: 
 
 - https://www.poetryfoundation.org/
-- https://poets.org/poems
-- https://poetrydb.org/index.html
+- https://poets.org/
+- https://poetrydb.org/
 
 Dataset: https://www.kaggle.com/datasets/watrgoat/lots-of-poems
