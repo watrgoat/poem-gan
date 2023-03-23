@@ -4,4 +4,5 @@ numpy
 langdetect
 contractions
 nltk
+gensim
 # http://chromedriver.chromium.org/downloads
