@@ -9,8 +9,6 @@
 
 import pandas as pd
 
-# https://pypi.org/project/gcld3/
-
 
 def get_poems(file_name: str) -> pd.DataFrame:
     with open(file_name, 'r'):

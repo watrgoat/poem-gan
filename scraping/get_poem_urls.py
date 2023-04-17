@@ -5,7 +5,7 @@ from pathlib import Path
 from multiprocessing import cpu_count
 
 
-url_path = Path(u'scraping\urls.txt')
+url_path = Path(r'scraping\urls.txt')
 
 # read past urls into set
 with open(url_path, mode='r', encoding='utf-8') as f:
@@ -53,11 +53,12 @@ def get_urls(num):
 
 
 def main():
-    numbas = list(range(1, 5))
-    processes = int(cpu_count()*.75)
+    get_urls(1)
+    # numbas = list(range(1, 5))
+    # processes = int(cpu_count()*.75)
     
-    with Pool(3) as p:
-        p.map(get_urls, numbas)
+    # with Pool(3) as p:
+    #     p.map(get_urls, numbas)
 
 
 if __name__ == '__main__':

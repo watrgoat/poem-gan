@@ -94,21 +94,12 @@ def get_urls():
     urls = urls.split('\n')
     
     return urls
-
-
-def save_data(data):
-    df = pd.DataFrame(columns=['title', 'author', 'content', 'tags'])
-    for poem in data:
-        if poem != None:
-            df.loc[len(df.index)] = poem
-    
-    df.to_pickle(poem_path)
     
 
 def main():
     mass_df = pd.DataFrame(columns=['title', 'author', 'content', 'tags'])
 
-    for i in range(694):
+    for i in range(1):
         mass_df = pd.concat([mass_df, get_poets_org(i)]) # max = 693
         mass_df.reset_index(drop=True, inplace=True)
 
