@@ -4,7 +4,7 @@ Natural language generation (NLG) for writing complex poetry
 
 ### Status:
 
-- Currently scraping poems
+- Currently tokenizing text
 - Filtering non-english poems
 - Testing different types of input data
 
